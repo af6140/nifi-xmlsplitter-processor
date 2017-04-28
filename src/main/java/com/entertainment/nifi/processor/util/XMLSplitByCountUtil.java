@@ -32,6 +32,7 @@ public class XMLSplitByCountUtil {
 
     public static String PREFIX="nifi_xmlsplitter";
     public static String SUFFIX="tmp.xml";
+    public static String LINE_SEPARATOR=System.getProperty("line.separator");
 
     public XMLSplitByCountUtil(InputStream inputStream, int splitDepth , int splitCount, String header, String footer){
         this.splitDepth = splitDepth;
@@ -81,8 +82,8 @@ public class XMLSplitByCountUtil {
                         outputStream = new BufferedOutputStream(new FileOutputStream(tmpFile));
                         openedStreams.add(outputStream);
                         if(this.header!=null) {
-                            outputStream.write(File.separatorChar);
                             outputStream.write(this.header.getBytes());
+                            outputStream.write(LINE_SEPARATOR.getBytes());
                         }
                     }
                     if (depth == splitDepth) {
@@ -97,7 +98,7 @@ public class XMLSplitByCountUtil {
                         count = 0;
 
                         if(this.footer!=null) {
-                            outputStream.write(File.separatorChar);
+                            outputStream.write(LINE_SEPARATOR.getBytes());
                             outputStream.write(this.footer.getBytes());
                         }
                         System.out.println("Close output stream###########################"+tmpFile.getName());

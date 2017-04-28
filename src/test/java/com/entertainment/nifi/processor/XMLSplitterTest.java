@@ -24,6 +24,9 @@ public class XMLSplitterTest {
         runner.setValidateExpressionUsage(false);
         runner.setProperty(XMLSplitter.SPLIT_DEPTH, "1");
         runner.setProperty(XMLSplitter.SPLIT_COUNT, "4");
+        runner.setProperty(XMLSplitter.HEADER, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                        "<catalog>");
+        runner.setProperty(XMLSplitter.FOOTER, "</catalog>");
         Path inputXML = FileSystems.getDefault().getPath("target/test-classes/test.xml");
         runner.enqueue(inputXML);
         runner.run(1);
