@@ -5,6 +5,8 @@ import org.apache.nifi.util.MockFlowFile;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +19,7 @@ import java.util.List;
  * Created by dwang on 4/21/17.
  */
 public class XMLSplitterTest {
+    private static Logger logger= LoggerFactory.getLogger(XMLSplitter.class);
     @Test
     public void testOnTrigger() throws IOException {
         TestRunner runner= TestRunners.newTestRunner(new XMLSplitter());
@@ -34,7 +37,7 @@ public class XMLSplitterTest {
         runner.assertQueueEmpty();
 
         List<MockFlowFile> results = runner.getFlowFilesForRelationship(XMLSplitter.REL_SPLIT);
-        System.out.println("Number of splitted files: "+results.size());
+        logger.info("Number of splitted files: "+results.size());
         for(MockFlowFile file: results) {
             String filename = file.getAttribute("filename");
             assert filename.startsWith(XMLSplitByCountUtil.PREFIX);

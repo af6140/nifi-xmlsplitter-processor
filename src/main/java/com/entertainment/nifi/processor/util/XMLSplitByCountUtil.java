@@ -1,5 +1,8 @@
 package com.entertainment.nifi.processor.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +39,7 @@ public class XMLSplitByCountUtil {
     public static String SUFFIX="tmp.xml";
     public static String LINE_SEPARATOR=System.getProperty("line.separator");
 
+    private static Logger logger = LoggerFactory.getLogger(XMLSplitByCountUtil.class);
 
     public XMLSplitByCountUtil(Path workDir, InputStream inputStream, int splitDepth , int splitCount, String header, String footer){
         this.splitDepth = splitDepth;
@@ -64,7 +68,7 @@ public class XMLSplitByCountUtil {
                 if (event.getEventType() == XMLStreamConstants.START_ELEMENT) {
                     StartElement startElement = event.asStartElement();
                     depth++ ;
-                    System.out.println("\nStart element: "+ startElement.getName().toString());
+                    logger.debug("Start element: "+ startElement.getName().toString());
                     if(depth==0){
                         Writer writer=new StringWriter();
                         // this is the root element, get namespace
@@ -73,20 +77,19 @@ public class XMLSplitByCountUtil {
                             Object o = it.next();
                             writer.write(o.toString()+"\n");
                         }
-                        System.out.println("XML namesapce: \n"+writer.toString());
+                        logger.debug("XML namesapce: \n"+writer.toString());
                     }
-                    System.out.println("Current depth : " + depth +" current count :"+count + " splitDepth:"+ splitDepth + " splitCount: "+ splitCount);
+                    logger.debug("Current depth : " + depth +" current count :"+count + " splitDepth:"+ splitDepth + " splitCount: "+ splitCount);
                     if(count ==0 && depth==splitDepth) {
                         //create new file
-                        Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr-x---");
-                        FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
+
                         if(workDir!=null && workDir.toFile().exists()) {
-                            tmpFile = Files.createTempFile(workDir, PREFIX, SUFFIX, fileAttributes).toFile();
+                            tmpFile = Files.createTempFile(workDir, PREFIX, SUFFIX).toFile();
                         } else {
-                            tmpFile = Files.createTempFile(PREFIX, SUFFIX, fileAttributes).toFile();
+                            tmpFile = Files.createTempFile(PREFIX, SUFFIX).toFile();
                         }
                         splitFiles.add(tmpFile);
-                        System.out.println("########################### :" + tmpFile.toPath().toAbsolutePath().toString());
+                        logger.debug("Create temp file:" + tmpFile.toPath().toAbsolutePath().toString());
                         outputStream = new BufferedOutputStream(new FileOutputStream(tmpFile));
                         openedStreams.add(outputStream);
                         if(this.header!=null) {
@@ -96,7 +99,7 @@ public class XMLSplitByCountUtil {
                     }
                     if (depth == splitDepth) {
                         count++;
-                        System.out.println("Current count: " + count);
+                        logger.debug("Current element count: " + count);
                         writeNode(xmlEventReader, event, outputStream);
                         // we get duplicate for current element
                         depth--;
@@ -109,7 +112,7 @@ public class XMLSplitByCountUtil {
                             outputStream.write(LINE_SEPARATOR.getBytes());
                             outputStream.write(this.footer.getBytes());
                         }
-                        System.out.println("Close output stream###########################"+tmpFile.getName());
+                        logger.debug("Close output stream for file"+tmpFile.getName());
                         outputStream.flush();
                         if(outputStream!=null) {
                             try {
@@ -123,8 +126,8 @@ public class XMLSplitByCountUtil {
                 if (event.getEventType() == XMLStreamConstants.END_ELEMENT){
                     EndElement endElement=event.asEndElement();
                     depth--;
-                    System.out.println("EndElement:"+endElement.getName().toString());
-                    System.out.println("Current depth : " + depth +" current count :"+count + " splitDepth:"+ splitDepth + " splitCount: "+ splitCount);
+                    logger.debug("EndElement:"+endElement.getName().toString());
+                    logger.debug("Current depth : " + depth +" current count :"+count + " splitDepth:"+ splitDepth + " splitCount: "+ splitCount);
 
                 }
 
@@ -137,7 +140,7 @@ public class XMLSplitByCountUtil {
                         }
                         outputStream.flush();
                         if(outputStream!=null) {
-                            System.out.println("Close output stream2###########################"+tmpFile.getName());
+                            logger.debug("Close output stream for file "+tmpFile.getName());
                             try {
                                 outputStream.close();
                             }catch(Exception e){
