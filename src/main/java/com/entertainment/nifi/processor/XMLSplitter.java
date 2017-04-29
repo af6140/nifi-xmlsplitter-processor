@@ -155,7 +155,8 @@ public class XMLSplitter extends AbstractProcessor {
         List<Path> splitted=new LinkedList<Path>();
         session.read(original, rawIn -> {
             try (final InputStream in = new BufferedInputStream(rawIn)) {
-                final XMLSplitByCountUtil splitter = new XMLSplitByCountUtil(FileSystems.getDefault().getPath(workDir), in, depth, count, header,footer);
+                String realWorkDir = workDir==null ? System.getProperty("java.io.tmpdir") : workDir;
+                final XMLSplitByCountUtil splitter = new XMLSplitByCountUtil(FileSystems.getDefault().getPath(realWorkDir), in, depth, count, header,footer);
                 final List<File> results = splitter.split();
                 for(File f: results) {
                     splitted.add(f.toPath());
