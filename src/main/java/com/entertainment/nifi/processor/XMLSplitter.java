@@ -17,6 +17,8 @@ import org.apache.nifi.processor.util.StandardValidators;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -82,6 +84,13 @@ public class XMLSplitter extends AbstractProcessor {
             .required(false)
             .expressionLanguageSupported(true)
             .build();
+    public static final PropertyDescriptor WORK_DIR = new PropertyDescriptor.Builder()
+            .name("Work Dir")
+            .description("Footer to append, usually parent xml closing tags.")
+            .addValidator(StandardValidators.DirectoryExistsValidator.VALID)
+            .required(false)
+            .expressionLanguageSupported(true)
+            .build();
 
 
     public static final Relationship REL_ORIGINAL = new Relationship.Builder()
@@ -103,6 +112,7 @@ public class XMLSplitter extends AbstractProcessor {
         properties.add(SPLIT_COUNT);
         properties.add(HEADER);
         properties.add(FOOTER);
+        properties.add(WORK_DIR);
         this.properties = Collections.unmodifiableList(properties);
 
         final Set<Relationship> relationships = new HashSet<>();
@@ -135,6 +145,7 @@ public class XMLSplitter extends AbstractProcessor {
 
         final String header = context.getProperty(HEADER).evaluateAttributeExpressions(original).getValue();
         final String footer = context.getProperty(FOOTER).evaluateAttributeExpressions(original).getValue();
+        final String workDir = context.getProperty(WORK_DIR).evaluateAttributeExpressions(original).getValue();
         final ComponentLog logger = getLogger();
 
         final List<FlowFile> splits = new ArrayList<>();
@@ -144,7 +155,7 @@ public class XMLSplitter extends AbstractProcessor {
         List<Path> splitted=new LinkedList<Path>();
         session.read(original, rawIn -> {
             try (final InputStream in = new BufferedInputStream(rawIn)) {
-                final XMLSplitByCountUtil splitter = new XMLSplitByCountUtil(in, depth, count, header,footer);
+                final XMLSplitByCountUtil splitter = new XMLSplitByCountUtil(FileSystems.getDefault().getPath(workDir), in, depth, count, header,footer);
                 final List<File> results = splitter.split();
                 for(File f: results) {
                     splitted.add(f.toPath());

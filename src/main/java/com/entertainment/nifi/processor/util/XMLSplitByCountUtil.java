@@ -2,6 +2,7 @@ package com.entertainment.nifi.processor.util;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -30,11 +31,13 @@ public class XMLSplitByCountUtil {
     private String header;
     private String footer;
 
+    private Path workDir;
     public static String PREFIX="nifi_xmlsplitter";
     public static String SUFFIX="tmp.xml";
     public static String LINE_SEPARATOR=System.getProperty("line.separator");
 
-    public XMLSplitByCountUtil(InputStream inputStream, int splitDepth , int splitCount, String header, String footer){
+
+    public XMLSplitByCountUtil(Path workDir, InputStream inputStream, int splitDepth , int splitCount, String header, String footer){
         this.splitDepth = splitDepth;
         this.splitCount =splitCount;
         this.inputStream = inputStream;
@@ -44,6 +47,7 @@ public class XMLSplitByCountUtil {
                 , Boolean.FALSE);
         this.header=header;
         this.footer=footer;
+        this.workDir=workDir;
     }
     public final List<File> split(){
         List<File> splitFiles =new LinkedList<File>();
@@ -76,7 +80,11 @@ public class XMLSplitByCountUtil {
                         //create new file
                         Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr-x---");
                         FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
-                        tmpFile = Files.createTempFile(PREFIX, SUFFIX, fileAttributes).toFile();
+                        if(workDir!=null && workDir.toFile().exists()) {
+                            tmpFile = Files.createTempFile(workDir, PREFIX, SUFFIX, fileAttributes).toFile();
+                        } else {
+                            tmpFile = Files.createTempFile(PREFIX, SUFFIX, fileAttributes).toFile();
+                        }
                         splitFiles.add(tmpFile);
                         System.out.println("########################### :" + tmpFile.toPath().toAbsolutePath().toString());
                         outputStream = new BufferedOutputStream(new FileOutputStream(tmpFile));
