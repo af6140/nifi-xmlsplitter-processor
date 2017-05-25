@@ -29,7 +29,7 @@ public class XMLSplitByCountUtilTest {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        xmlSplitByCountUtil =new XMLSplitByCountUtil(new File("./target/test-classes").toPath(),in, 1, 4, "aaaaa\n", "bbbbb\n");
+        xmlSplitByCountUtil =new XMLSplitByCountUtil(new File("./target/test-classes").toPath(),in, 1, 4, null, null);
         List<File> files = xmlSplitByCountUtil.split();
         assert (files.size()==3);
         for(File f: files) {
@@ -52,7 +52,7 @@ public class XMLSplitByCountUtilTest {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        xmlSplitByCountUtil =new XMLSplitByCountUtil(new File("./target/test-classes").toPath(),in, 1, 5, "aaaaa\n", "bbbbb\n");
+        xmlSplitByCountUtil =new XMLSplitByCountUtil(new File("./target/test-classes").toPath(),in, 1, 5, null, null);
         List<File> files = xmlSplitByCountUtil.split();
         assert (files.size()==3);
         for(File f: files) {
