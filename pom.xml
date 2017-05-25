@@ -86,4 +86,12 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>entertainment_snapshots</id>
+            <name>Internal Snapshot Repository</name>
+            <url>https://nexus.prod.co.entpub.net/nexus/content/repositories/entertainment_snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
