@@ -135,7 +135,7 @@ public class XMLSplitByCountUtil {
                     //not finishing count
                     if(count < splitCount && count!=0) {
                         if(this.footer!=null) {
-                            outputStream.write(File.separatorChar);
+                            outputStream.write(LINE_SEPARATOR.getBytes());
                             outputStream.write(this.footer.getBytes());
                         }
                         outputStream.flush();
