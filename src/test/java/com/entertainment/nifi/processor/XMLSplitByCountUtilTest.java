@@ -25,7 +25,7 @@ public class XMLSplitByCountUtilTest {
 
     }
 
-    @Test
+    //@Test
     public void testEqualSplit() {
         InputStream in = null;
         try {
@@ -49,7 +49,7 @@ public class XMLSplitByCountUtilTest {
     }
 
     //not equal split
-    //@Test
+    @Test
     public void testNoEqualSplit() {
         InputStream in = null;
         try {

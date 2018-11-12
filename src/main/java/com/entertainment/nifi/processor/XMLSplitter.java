@@ -8,6 +8,7 @@ import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
+import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.logging.ComponentLog;
 import org.apache.nifi.processor.*;
@@ -66,7 +67,7 @@ public class XMLSplitter extends AbstractProcessor {
             .description("How many elements at depth in one split file.")
             .required(true)
             .addValidator(StandardValidators.POSITIVE_INTEGER_VALIDATOR)
-            .expressionLanguageSupported(true)
+            .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .defaultValue("10")
             .build();
 
@@ -74,7 +75,7 @@ public class XMLSplitter extends AbstractProcessor {
             .name("Header")
             .description("Header to prepend, usually parent xml opening tags.")
             .required(false)
-            .expressionLanguageSupported(true)
+            .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .addValidator(StandardValidators.ATTRIBUTE_EXPRESSION_LANGUAGE_VALIDATOR)
             .build();
     public static final PropertyDescriptor FOOTER = new PropertyDescriptor.Builder()
@@ -82,14 +83,14 @@ public class XMLSplitter extends AbstractProcessor {
             .description("Footer to append, usually parent xml closing tags.")
             .addValidator(StandardValidators.ATTRIBUTE_EXPRESSION_LANGUAGE_VALIDATOR)
             .required(false)
-            .expressionLanguageSupported(true)
+            .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .build();
     public static final PropertyDescriptor WORK_DIR = new PropertyDescriptor.Builder()
             .name("Work Dir")
             .description("Footer to append, usually parent xml closing tags.")
             .addValidator(StandardValidators.DirectoryExistsValidator.VALID)
             .required(false)
-            .expressionLanguageSupported(true)
+            .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .build();
 
 
